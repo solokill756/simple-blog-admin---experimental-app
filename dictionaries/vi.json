@@ -1,0 +1,35 @@
+{
+  "homepage": {
+    "title": "Chào mừng đến với Blog Admin",
+    "greeting": "Xin chào, người dùng quản trị!",
+    "viewPosts": "Xem bài viết"
+  },
+  "languageSwitcher": {
+    "label": "Đổi ngôn ngữ"
+  },
+  "dashboard": {
+    "posts": {
+      "title": "Bài viết",
+      "description": "Quản lý bài viết của bạn",
+      "addPost": "Thêm bài viết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xoá",
+      "confirmDelete": "Bạn có chắc chắn muốn xoá bài viết này?",
+      "notFound": "Bài viết không tồn tại",
+      "noTitle": "Không có tiêu đề",
+      "noContent": "Không có nội dung",
+      "deleteSuccess": "Bài viết đã được xoá thành công!",
+      "deleteFailed": "Xoá bài viết thất bại",
+      "deleteError": "Có lỗi xảy ra khi xoá bài viết",
+      "deleteTimeout": "Yêu cầu hết thời gian chờ - vui lòng thử lại",
+      "readMore": "Đọc thêm →",
+      "loading": "Đang tải bài viết..."
+    },
+    "postDetail": {
+      "loading": "Đang tải bài viết..."
+    }
+  },
+  "common": {
+    "back": "Quay lại"
+  }
+}
