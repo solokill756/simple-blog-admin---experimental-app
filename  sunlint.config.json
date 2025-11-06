@@ -10,6 +10,7 @@
     "S010": "error",
     "S019": "error",
     "S022": "error",
+    "S030": "warn",
 
     "T016": "error",
     "T017": "warn",

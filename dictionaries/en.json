@@ -1,0 +1,35 @@
+{
+  "homepage": {
+    "title": "Welcome to Blog Admin",
+    "greeting": "Hello, Admin User!",
+    "viewPosts": "View Posts"
+  },
+  "languageSwitcher": {
+    "label": "Switch Language"
+  },
+  "dashboard": {
+    "posts": {
+      "title": "Posts",
+      "description": "Manage your blog posts",
+      "addPost": "Add Post",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this post?",
+      "notFound": "Post not found",
+      "noTitle": "No Title",
+      "noContent": "No content",
+      "deleteSuccess": "Post deleted successfully!",
+      "deleteFailed": "Failed to delete post",
+      "deleteError": "An error occurred while deleting the post",
+      "deleteTimeout": "Request timeout - please try again",
+      "readMore": "Read More →",
+      "loading": "Loading posts..."
+    },
+    "postDetail": {
+      "loading": "Loading post..."
+    }
+  },
+  "common": {
+    "back": "Back"
+  }
+}
