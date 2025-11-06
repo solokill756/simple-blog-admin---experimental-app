@@ -1,0 +1,51 @@
+'use server';
+
+import z from 'zod';
+import { updatePostInDatabase } from '../../lib/data/mock-data';
+import { UpdateAndAddState } from '../../lib/type/actionType';
+const UpdatePostSchema = z.object({
+  id: z.string().min(1, 'Post ID is required'),
+  title: z.string().min(1, 'Title is required'),
+  body: z.string().min(1, 'Body is required'),
+});
+export async function updatePostAction(
+  prevState: UpdateAndAddState,
+  formData: FormData
+) {
+  const rawData = {
+    id: formData.get('id') as string,
+    title: formData.get('title'),
+    body: formData.get('body'),
+  };
+  const validationResult = UpdatePostSchema.safeParse(rawData);
+
+  if (!validationResult.success) {
+    return {
+      errors: validationResult.error.flatten().fieldErrors,
+      message: 'Validation failed',
+    };
+  }
+  try {
+    const { id, title, body } = validationResult.data;
+    await updatePostInDatabase(id, {
+      title,
+      body,
+    });
+    return {
+      message: '',
+      errors: {},
+    };
+  } catch (error) {
+    const getErrorMessage =
+      error instanceof Error ? error.message : String(error);
+    console.error('Database Error:', {
+      getErrorMessage,
+      postId: rawData.id,
+      error,
+    });
+    return {
+      message: 'An error occurred while updating the post',
+      errors: {},
+    };
+  }
+}

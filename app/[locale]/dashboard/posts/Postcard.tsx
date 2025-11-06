@@ -2,6 +2,7 @@
 
 import { POSTCARD_CONTENT } from '@/app/lib/constants';
 import { DictType } from '@/app/lib/type/dictType';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface PostCardProps {
@@ -11,20 +12,35 @@ interface PostCardProps {
   userId: string;
   locale: string;
   dict: DictType;
+  image?: string;
 }
-
+const DEFAULT_IMAGE = '/images/default_image.png';
 export default function RenderPostCard({
   id,
   title,
   body,
   locale,
   dict,
+  image,
 }: PostCardProps) {
   return (
     <Link href={`/${locale}/dashboard/posts/${id}`}>
       <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 cursor-pointer">
+        {/* Image Container */}
+        <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <Image
+            src={image || DEFAULT_IMAGE}
+            alt={title || POSTCARD_CONTENT.NO_TITLE}
+            width={400}
+            height={250}
+            className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+            priority={false}
+          />
+        </div>
+
+        {/* Content Container */}
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
             {typeof title === 'string' && title.trim()
               ? title
               : dict?.dashboard?.posts?.noTitle || POSTCARD_CONTENT.NO_TITLE}

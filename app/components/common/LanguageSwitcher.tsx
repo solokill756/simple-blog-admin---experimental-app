@@ -1,4 +1,3 @@
-// sunlint-disable-next-line S030
 'use client';
 
 import { useTranslation } from 'react-i18next';
@@ -22,13 +21,14 @@ export default function LanguageSwitcher() {
       return;
     }
 
-    const segments = pathname.split('/');
-    if (i18nConfig.locales.includes(segments[1])) {
-      segments[1] = newLocale;
+    const pathSegments = pathname.split('/');
+    const localeList = i18nConfig.locales;
+    if (localeList.includes(pathSegments[1])) {
+      pathSegments[1] = newLocale;
     } else {
-      segments.splice(1, 0, newLocale);
+      pathSegments.splice(1, 0, newLocale);
     }
-    const newPath = segments.join('/');
+    const newPath = pathSegments.join('/');
     router.push(newPath);
   };
 
@@ -39,31 +39,35 @@ export default function LanguageSwitcher() {
   return (
     <div className="rounded-lg border border-gray-300 p-3">
       <strong className="font-semibold">{t('languageSwitcher.label')}</strong>
-      {i18nConfig.locales.map((locale) => (
-        <button
-          key={locale}
-          onClick={() => handleChange(locale)}
-          disabled={currentLocale === locale}
-          className={`
-            ml-2 
-            rounded-md 
-            px-3 
-            py-1
-            text-sm
-            transition-colors
-       
-            ${
-              currentLocale === locale
-                ? 'font-bold bg-gray-200 text-gray-900'
-                : 'font-normal text-gray-700 hover:bg-gray-100'
-            }
-            disabled:opacity-50 
-            disabled:cursor-not-allowed
-          `}
-        >
-          {locale.toUpperCase()}
-        </button>
-      ))}
+      {i18nConfig.locales.map((locale, index) => {
+        const itemId = `lang-${locale}-${String(index)}`;
+        const isCurrentLocale = currentLocale === locale;
+        return (
+          <button
+            key={itemId}
+            onClick={() => handleChange(locale)}
+            disabled={isCurrentLocale}
+            className={`
+              ml-2 
+              rounded-md 
+              px-3 
+              py-1
+              text-sm
+              transition-colors
+         
+              ${
+                isCurrentLocale
+                  ? 'font-bold bg-gray-200 text-gray-900'
+                  : 'font-normal text-gray-700 hover:bg-gray-100'
+              }
+              disabled:opacity-50 
+              disabled:cursor-not-allowed
+            `}
+          >
+            {locale.toUpperCase()}
+          </button>
+        );
+      })}
     </div>
   );
 }

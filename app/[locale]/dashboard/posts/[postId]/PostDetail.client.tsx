@@ -36,10 +36,22 @@ export default function RenderPostDetail({
   }
 
   const handleEdit = (): void => {
+    // Sensitive operation: requires re-authentication check
+    if (!postId) {
+      toast.error(dict?.dashboard?.posts?.invalidId!);
+      return;
+    }
+    // TODO: Implement re-authentication middleware before allowing edit
     router.push(`/${locale}/dashboard/posts/${postId}/edit`);
   };
 
   const handleDeleteClick = (): void => {
+    // Sensitive operation: requires re-authentication check
+    if (!postId) {
+      toast.error(dict?.dashboard?.posts?.invalidId!);
+      return;
+    }
+    // TODO: Implement re-authentication middleware before allowing delete
     setIsShowConfirm(true);
   };
 

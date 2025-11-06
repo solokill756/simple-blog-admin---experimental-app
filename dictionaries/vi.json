@@ -9,9 +9,11 @@
   },
   "dashboard": {
     "posts": {
-      "title": "Bài viết",
+      "label": "Bài viết",
       "description": "Quản lý bài viết của bạn",
       "addPost": "Thêm bài viết",
+      "addNewPost": "Thêm bài viết mới",
+      "editPost": "Chỉnh sửa bài viết",
       "edit": "Chỉnh sửa",
       "delete": "Xoá",
       "confirmDelete": "Bạn có chắc chắn muốn xoá bài viết này?",
@@ -23,7 +25,23 @@
       "deleteError": "Có lỗi xảy ra khi xoá bài viết",
       "deleteTimeout": "Yêu cầu hết thời gian chờ - vui lòng thử lại",
       "readMore": "Đọc thêm →",
-      "loading": "Đang tải bài viết..."
+      "loading": "Đang tải bài viết...",
+      "formDescription": "Điền vào biểu mẫu để tạo hoặc cập nhật bài viết của bạn",
+      "formTitle": "Tiêu đề bài viết",
+      "formContent": "Nội dung bài viết",
+      "cancel": "Hủy",
+      "submit": "Gửi",
+      "invalidId": "ID bài viết không hợp lệ.",
+      "errorsMessages": {
+        "missingFields": "Vui lòng điền vào tất cả các trường.",
+        "updateFailed": "Cập nhật bài viết thất bại.",
+        "notFound": "Bài viết không tồn tại.",
+        "server_error": "Có lỗi xảy ra khi xử lý yêu cầu của bạn."
+      },
+      "successMessages": {
+        "createSuccess": "Bài viết đã được tạo thành công!",
+        "updateSuccess": "Bài viết đã được cập nhật thành công!"
+      }
     },
     "postDetail": {
       "loading": "Đang tải bài viết..."

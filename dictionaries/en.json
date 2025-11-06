@@ -9,9 +9,11 @@
   },
   "dashboard": {
     "posts": {
-      "title": "Posts",
+      "label": "Posts",
       "description": "Manage your blog posts",
       "addPost": "Add Post",
+      "addNewPost": "Add New Post",
+      "editPost": "Edit Post",
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Are you sure you want to delete this post?",
@@ -23,7 +25,23 @@
       "deleteError": "An error occurred while deleting the post",
       "deleteTimeout": "Request timeout - please try again",
       "readMore": "Read More →",
-      "loading": "Loading posts..."
+      "loading": "Loading posts...",
+      "formDescription": "Fill in the form to create or update your post",
+      "formTitle": "Post Title",
+      "formContent": "Post Content",
+      "submit": "Submit",
+      "invalidId": "Invalid post ID.",
+      "cancel": "Cancel",
+      "errorsMessages": {
+        "missingFields": "Please fill in all fields.",
+        "updateFailed": "Failed to update post.",
+        "notFound": "Post not found.",
+        "server_error": "An error occurred while processing your request."
+      },
+      "successMessages": {
+        "createSuccess": "Post created successfully!",
+        "updateSuccess": "Post updated successfully!"
+      }
     },
     "postDetail": {
       "loading": "Loading post..."

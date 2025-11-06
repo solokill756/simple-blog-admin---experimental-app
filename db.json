@@ -1,0 +1,37 @@
+{
+  "posts": [
+    {
+      "title": "Second Post Alive",
+      "body": "This is the body of the second post.",
+      "id": "2",
+      "image": "https://www.huongnghiepaau.com/wp-content/uploads/2023/06/cong-thuc-viet-content-AIDA.jpg"
+    },
+    {
+      "id": "3",
+      "title": "Third Post",
+      "userId": "3",
+      "body": "This is the body of the third post.",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjYxV_rkYUIBcXgAargK-qPVlV4IrDqHnJow&s"
+    },
+    {
+      "id": "f745",
+      "title": "BAI BAO MOI",
+      "body": "THANH QUA LAM DUOC"
+    },
+    {
+      "id": "dcf7",
+      "title": "BAI BAO 1",
+      "body": "NOI DUNG BAI BAO 1"
+    },
+    {
+      "id": "37fc",
+      "title": "Post 1 and 2",
+      "body": "Create Post 1 and 2"
+    },
+    {
+      "id": "b69a",
+      "title": "chao ban",
+      "body": "minh la thao dep  trai"
+    }
+  ]
+}

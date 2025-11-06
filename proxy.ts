@@ -25,6 +25,9 @@ function getPreferredLocale(request: NextRequest): string {
   return 'en';
 }
 export function redirectLocale(request: NextRequest): NextResponse | undefined {
+  if (request.headers.has('next-action')) {
+    return undefined;
+  }
   if (!validateContentType(request)) {
     return NextResponse.json(
       { error: 'Invalid Content-Type header' },
@@ -50,7 +53,9 @@ export function redirectLocale(request: NextRequest): NextResponse | undefined {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!api|__NEXT_ACTIONS__|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
 
-export { redirectLocale as middleware };
+export { redirectLocale as proxy };

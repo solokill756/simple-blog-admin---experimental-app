@@ -2,26 +2,37 @@ import { NextResponse, NextRequest } from 'next/server';
 import {
   getPostByIdFromDatabase,
   getPostsFromDatabase,
-} from '../../lib/data/mock-data';
-import { CONTENT_TYPES, HTTP_STATUS } from '@/app/lib/constants';
+} from '@/app/lib/data/mock-data';
+import { HTTP_STATUS } from '@/app/lib/constants';
+
+const CONTENT_TYPE_JSON = 'application/json';
+
+function validateContentType(request: NextRequest): boolean {
+  const contentType = request.headers.get('content-type');
+  return !contentType || contentType.includes(CONTENT_TYPE_JSON);
+}
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const contentType = request.headers.get('content-type');
-    if (
-      !contentType ||
-      contentType.includes(CONTENT_TYPES.JSON) ||
-      contentType.includes(CONTENT_TYPES.PLAIN_TEXT)
-    ) {
+    // Validate content type early
+    if (!validateContentType(request)) {
       return NextResponse.json(
         { error: 'Invalid Content-Type header' },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
+
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('id');
 
     if (postId) {
+      if (typeof postId !== 'string' || postId.trim().length === 0) {
+        return NextResponse.json(
+          { error: 'Invalid post ID' },
+          { status: HTTP_STATUS.BAD_REQUEST }
+        );
+      }
+
       const post = await getPostByIdFromDatabase(postId);
       if (!post) {
         return NextResponse.json(
@@ -35,6 +46,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const posts = await getPostsFromDatabase();
     return NextResponse.json(posts);
   } catch (error) {
+    console.error('Failed to fetch posts:', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Failed to fetch posts' },
       { status: HTTP_STATUS.SERVER_ERROR }

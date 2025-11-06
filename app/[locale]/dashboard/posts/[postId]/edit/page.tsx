@@ -1,7 +1,7 @@
-import { getDictionary } from '@/app/lib/get-dictionary';
-import RenderPostDetail from './PostDetail.client';
-import { PostModel } from '@/app/lib/data/models/postModel';
 import { getPostByIdFromDatabase } from '@/app/lib/data/mock-data';
+import { PostModel } from '@/app/lib/data/models/postModel';
+import { getDictionary } from '@/app/lib/get-dictionary';
+import PostForm from '../../PostForm';
 
 type Props = {
   params: Promise<{ locale: 'en' | 'vi'; postId: string }>;
@@ -21,6 +21,6 @@ export default async function RenderPostPage({ params }: Props) {
     );
   }
   return (
-    <RenderPostDetail postId={postId} locale={locale} dict={dict} post={post} />
+    <PostForm postId={postId} postCard={post} dict={dict} locale={locale} />
   );
 }

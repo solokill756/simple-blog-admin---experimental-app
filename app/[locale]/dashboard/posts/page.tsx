@@ -1,6 +1,7 @@
 import { getDictionary } from '@/app/lib/get-dictionary';
-import { API_BASE_URL } from '@/app/lib/constants';
 import RenderPostsList from './PostList';
+import { getPostsFromDatabase } from '@/app/lib/data/mock-data';
+import { PostModel } from '@/app/lib/data/models/postModel';
 
 type Props = {
   params: Promise<{ locale: 'en' | 'vi' }>;
@@ -9,9 +10,6 @@ type Props = {
 export default async function RenderPostsPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale);
-  const response = await fetch(`${API_BASE_URL}/api/posts`, {
-    next: { revalidate: 60 },
-  });
-  const posts = await response.json();
+  const posts: PostModel[] = await getPostsFromDatabase();
   return <RenderPostsList dict={dict} locale={locale} posts={posts} />;
 }

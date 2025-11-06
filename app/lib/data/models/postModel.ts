@@ -3,4 +3,5 @@ export interface PostModel {
   title: string;
   userId: string;
   body: string;
+  image?: string;
 }

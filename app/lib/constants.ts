@@ -51,3 +51,12 @@ export const POSTCARD_CONTENT = {
 export const POSTS_CONTENT = {
   LOADING: 'Loading posts...',
 };
+
+export const POST_LIST_CONTENT = {
+  NO_POSTS: 'No posts available. Please add a new post.',
+  LOADING: 'Loading posts...',
+  ERROR: 'Failed to load posts. Please try again later.',
+  NO_CONTENT: 'No content available.',
+  NO_TITLE: 'Posts',
+  ADD_POST: 'Add Post',
+};

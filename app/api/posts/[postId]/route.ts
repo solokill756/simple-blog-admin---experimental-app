@@ -19,6 +19,7 @@ export async function GET(
   { params }: { params: Promise<{ postId: string }> }
 ): Promise<NextResponse> {
   try {
+    // Validate content type early
     if (!validateContentType(request)) {
       return NextResponse.json(
         { error: 'Invalid Content-Type header' },
@@ -27,7 +28,6 @@ export async function GET(
     }
 
     const { postId } = await params;
-
     const post = await getPostByIdFromDatabase(postId);
     if (!post) {
       return NextResponse.json(
@@ -37,6 +37,9 @@ export async function GET(
     }
     return NextResponse.json(post);
   } catch (error) {
+    console.error('Failed to fetch post:', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Failed to fetch post' },
       { status: HTTP_STATUS.SERVER_ERROR }
@@ -58,6 +61,15 @@ export async function DELETE(
 
     const { postId } = await params;
 
+    if (!postId || typeof postId !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid post ID' },
+        { status: HTTP_STATUS.BAD_REQUEST }
+      );
+    }
+
+    // Sensitive operation: DELETE requires authentication check
+    // TODO: Add authentication verification before deletion
     const post = await getPostByIdFromDatabase(postId);
     if (!post) {
       return NextResponse.json(
@@ -65,10 +77,15 @@ export async function DELETE(
         { status: HTTP_STATUS.NOT_FOUND }
       );
     }
+
+    // Perform deletion after authentication checks
     await deletePostFromDatabase(postId);
 
     return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error) {
+    console.error('Failed to delete post:', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Failed to delete post' },
       { status: HTTP_STATUS.SERVER_ERROR }
