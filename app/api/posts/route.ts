@@ -4,6 +4,8 @@ import {
   getPostsFromDatabase,
 } from '@/app/lib/data/mock-data';
 import { HTTP_STATUS } from '@/app/lib/constants';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/lib/authOptions';
 
 const CONTENT_TYPE_JSON = 'application/json';
 
@@ -13,6 +15,13 @@ function validateContentType(request: NextRequest): boolean {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: HTTP_STATUS.UNAUTHORIZED }
+    );
+  }
   try {
     // Validate content type early
     if (!validateContentType(request)) {
