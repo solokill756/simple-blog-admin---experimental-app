@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { FiArrowLeft, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { PostModel } from '@/app/lib/data/models/postModel';
 import { useState } from 'react';
@@ -11,6 +10,9 @@ import {
 } from '@/app/lib/constants';
 import toast from 'react-hot-toast';
 import { DictType } from '@/app/lib/type/dictType';
+import { useNavigationLoading } from '@/app/lib/hooks/useNavigationLoading';
+import { useAppDispatch } from '@/app/lib/hooks/useRedux';
+import { postsApi } from '@/app/lib/redux/api/posts/postsApi';
 export default function RenderPostDetail({
   postId,
   locale,
@@ -22,9 +24,10 @@ export default function RenderPostDetail({
   dict: DictType;
   post: PostModel;
 }) {
-  const router = useRouter();
   const [isShowConfirm, setIsShowConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { push } = useNavigationLoading();
+  const dispatch = useAppDispatch();
   if (!post) {
     return (
       <div className={TAILWIND.CONTAINER}>
@@ -42,7 +45,7 @@ export default function RenderPostDetail({
       return;
     }
     // TODO: Implement re-authentication middleware before allowing edit
-    router.push(`/${locale}/dashboard/posts/${postId}/edit`);
+    push(`/${locale}/dashboard/posts/${postId}/edit`);
   };
 
   const handleDeleteClick = (): void => {
@@ -62,7 +65,17 @@ export default function RenderPostDetail({
         method: 'DELETE',
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
       });
-      router.push(`/${locale}/dashboard/posts`);
+      toast.success(
+        dict?.dashboard?.posts?.deleteSuccess ||
+          'Post deleted successfully'
+      );
+      dispatch(postsApi.util.invalidateTags(['Posts']));
+      dispatch(
+        postsApi.endpoints.getPosts.initiate(undefined, {
+          forceRefetch: true,
+        })
+      );
+      push(`/${locale}/dashboard/posts`);
     } catch (error) {
       console.error('Failed to delete post', {
         postId,
@@ -88,7 +101,7 @@ export default function RenderPostDetail({
   };
 
   const handleBack = (): void => {
-    router.push(`/${locale}/dashboard/posts`);
+    push(`/${locale}/dashboard/posts`);
   };
 
   return (

@@ -1,11 +1,8 @@
-import {
-  deletePostFromDatabase,
-  getPostByIdFromDatabase,
-} from '@/app/lib/data/mock-data';
 import { NextResponse, NextRequest } from 'next/server';
 import { HTTP_STATUS } from '@/app/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/authOptions';
+import { deletePostById, getPostById } from '@/app/lib/services/postService';
 
 function validateContentType(request: NextRequest): boolean {
   const contentType = request.headers.get('content-type');
@@ -33,14 +30,20 @@ export async function GET(
       );
     }
     const { postId } = await params;
-    const post = await getPostByIdFromDatabase(postId);
+    const post = await getPostById(postId);
     if (!post) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: HTTP_STATUS.NOT_FOUND }
       );
     }
-    return NextResponse.json(post);
+    return NextResponse.json(post, {
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store',
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch post:', {
       error: error instanceof Error ? error.message : String(error),
@@ -80,9 +83,7 @@ export async function DELETE(
       );
     }
 
-    // Sensitive operation: DELETE requires authentication check
-    // TODO: Add authentication verification before deletion
-    const post = await getPostByIdFromDatabase(postId);
+    const post = await getPostById(postId);
     if (!post) {
       return NextResponse.json(
         { error: 'Post not found' },
@@ -90,10 +91,18 @@ export async function DELETE(
       );
     }
 
-    // Perform deletion after authentication checks
-    await deletePostFromDatabase(postId);
+    await deletePostById(postId);
 
-    return NextResponse.json({ message: 'Post deleted successfully' });
+    return NextResponse.json(
+      { message: 'Post deleted successfully' },
+      {
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate',
+          'CDN-Cache-Control': 'no-store',
+          'Vercel-CDN-Cache-Control': 'no-store',
+        },
+      }
+    );
   } catch (error) {
     console.error('Failed to delete post:', {
       error: error instanceof Error ? error.message : String(error),

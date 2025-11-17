@@ -1,10 +1,7 @@
 import { GET } from '../route';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import {
-  getPostsFromDatabase,
-  getPostByIdFromDatabase,
-} from '@/app/lib/data/mock-data';
+
 import { HTTP_STATUS } from '@/app/lib/constants';
 
 // Mock dependencies

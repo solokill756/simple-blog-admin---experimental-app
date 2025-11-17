@@ -1,11 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
-import {
-  getPostByIdFromDatabase,
-  getPostsFromDatabase,
-} from '@/app/lib/data/mock-data';
 import { HTTP_STATUS } from '@/app/lib/constants';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/authOptions';
+import { getAllPosts, getPostById } from '@/app/lib/services/postService';
 
 const CONTENT_TYPE_JSON = 'application/json';
 
@@ -13,6 +10,9 @@ function validateContentType(request: NextRequest): boolean {
   const contentType = request.headers.get('content-type');
   return !contentType || contentType.includes(CONTENT_TYPE_JSON);
 }
+
+// Không dùng dynamic = 'force-dynamic' vì không tương thích với cacheComponents
+// Thay vào đó, đảm bảo getAllPosts() sẽ fetch mới sau khi revalidateTag
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
@@ -42,18 +42,31 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         );
       }
 
-      const post = await getPostByIdFromDatabase(postId);
+      const post = await getPostById(postId);
       if (!post) {
         return NextResponse.json(
           { error: 'Post not found' },
           { status: HTTP_STATUS.NOT_FOUND }
         );
       }
-      return NextResponse.json(post);
+      return NextResponse.json(post, {
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate',
+          'CDN-Cache-Control': 'no-store',
+          'Vercel-CDN-Cache-Control': 'no-store',
+        },
+      });
     }
 
-    const posts = await getPostsFromDatabase();
-    return NextResponse.json(posts);
+    // Dùng getAllPosts để tận dụng server-side cache (revalidate sau 60s hoặc khi revalidateTag)
+    const posts = await getAllPosts();
+    return NextResponse.json(posts, {
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store',
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch posts:', {
       error: error instanceof Error ? error.message : String(error),

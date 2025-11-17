@@ -1,14 +1,14 @@
 'use client';
 import { PostModel } from '@/app/lib/data/models/postModel';
 import RenderPostFormInput from './PostFormInput';
-import { useRouter } from 'next/navigation';
 import { DictType } from '@/app/lib/type/dictType';
 import toast from 'react-hot-toast';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, useRef } from 'react';
 import { updatePostAction } from '@/app/actions/posts/putAction';
 import { addAction } from '@/app/actions/posts/addAction';
 import { UpdateAndAddState } from '@/app/lib/type/actionType';
-import { error } from 'console';
+import { useSession } from 'next-auth/react';
+import { useNavigationLoading } from '@/app/lib/hooks/useNavigationLoading';
 
 interface PostFormProps {
   postId?: string | undefined;
@@ -23,13 +23,15 @@ export default function PostForm({
   locale,
   dict,
 }: PostFormProps) {
-  const router = useRouter();
   const postDict = dict?.dashboard?.posts;
-
+  const session = useSession();
   const [formData, setFormData] = useState({
     title: postCard?.title || '',
     body: postCard?.body || '',
   });
+  const { push } = useNavigationLoading();
+  const toastShownRef = useRef(false);
+  const previousPendingRef = useRef(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -41,25 +43,33 @@ export default function PostForm({
     }));
   };
 
-  const initialState = postId
-    ? {
-        message: '',
-        errors: {
-          title: [],
-          body: [],
-          id: [],
-        },
-      }
-    : {
-        message: '',
-        errors: {
-          title: [],
-          body: [],
-        },
-      };
-  const [state, formAction, isPending] = postId
-    ? useActionState(updatePostAction, initialState)
-    : useActionState(addAction, initialState);
+  const initialState: UpdateAndAddState = {
+    message: '',
+    errors: {
+      title: [],
+      body: [],
+    },
+  };
+
+  const handleAction = async (
+    prevState: UpdateAndAddState | undefined,
+    formData: FormData
+  ): Promise<UpdateAndAddState> => {
+    const state = prevState || initialState;
+    if (postId) {
+      formData.set('id', postId);
+      const result = await updatePostAction(state, formData);
+      return result || initialState;
+    } else {
+      const result = await addAction(state, formData);
+      return result || initialState;
+    }
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    handleAction,
+    initialState
+  ) as [UpdateAndAddState, (payload: FormData) => void, boolean];
 
   const handleFormSubmit = async (fd: FormData) => {
     fd.set('title', formData.title);
@@ -68,30 +78,54 @@ export default function PostForm({
   };
 
   useEffect(() => {
-    const errorPropNames = Object.getOwnPropertyNames(state.errors || {});
-    const hasErrors = errorPropNames.length > 0;
+    const wasPending = previousPendingRef.current;
+    const isNowPending = isPending;
+    previousPendingRef.current = isPending;
 
-    if (!state.message && (!state.errors || !hasErrors)) {
-      if (!postId) {
-        toast.success(
-          postDict?.successMessages?.createSuccess ?? state.message
-        );
-        router.push(`/${locale}/dashboard/posts`);
-      } else {
-        toast.success(
-          postDict?.successMessages?.updateSuccess ?? state.message
-        );
-        router.push(`/${locale}/dashboard/posts/${postId}`);
+    if (wasPending && !isNowPending) {
+      const errorPropNames = Object.getOwnPropertyNames(state.errors || {});
+      const hasErrors = errorPropNames.some((key) => {
+        const errors = state.errors?.[key as keyof typeof state.errors];
+        return Array.isArray(errors) && errors.length > 0;
+      });
+
+      if (!state.message && !hasErrors) {
+        if (!toastShownRef.current) {
+          toastShownRef.current = true;
+          if (!postId) {
+            toast.success(
+              postDict?.successMessages?.createSuccess ||
+                'Post created successfully'
+            );
+
+            setFormData({ title: '', body: '' });
+
+            push(`/${locale}/dashboard/posts`);
+          } else {
+            toast.success(
+              postDict?.successMessages?.updateSuccess ||
+                'Post updated successfully'
+            );
+
+            push(`/${locale}/dashboard/posts/${postId}`);
+          }
+          toastShownRef.current = false;
+        }
+        return;
+      }
+
+      if (state.message && hasErrors) {
+        toast.error(postDict?.errorsMessages?.updateFailed ?? state.message);
+        toastShownRef.current = false;
+        return;
+      }
+      if (state.message && !hasErrors) {
+        toast.error(postDict?.errorsMessages?.server_error ?? state.message);
+        toastShownRef.current = false;
+        return;
       }
     }
-
-    if (state.message && state.errors && hasErrors) {
-      toast.error(postDict?.errorsMessages?.updateFailed ?? state.message);
-    }
-    if (state.message && !state.errors) {
-      toast.error(postDict?.errorsMessages?.server_error ?? state.message);
-    }
-  }, [state, router, postId, locale, postDict]);
+  }, [state, isPending, push, postId, locale, postDict]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 dark:bg-gray-900">
@@ -120,6 +154,14 @@ export default function PostForm({
           />
 
           <RenderPostFormInput
+            name="userId"
+            value={session.data?.user?.id || ''}
+            onChange={() => {}}
+            type="hidden"
+            label={''}
+          />
+
+          <RenderPostFormInput
             label={postDict?.formContent!}
             value={formData.body}
             onChange={handleInputChange}
@@ -132,7 +174,7 @@ export default function PostForm({
           <div className="flex gap-4 pt-4">
             <button
               type="button"
-              onClick={() => router.push(`/${locale}/dashboard/posts`)}
+              onClick={() => push(`/${locale}/dashboard/posts`)}
               className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition duration-200"
             >
               {postDict?.cancel}
